@@ -1,13 +1,21 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { GraphQLISODateTime, GraphQLModule } from '@nestjs/graphql';
+import { MiddlewareConsumer, Module, NestModule, Query } from '@nestjs/common';
+import { GraphQLISODateTime, GraphQLModule, Mutation } from '@nestjs/graphql';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
+import { PassportModule } from '@nestjs/passport';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DonationsModule } from './donations/donations.module';
-import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { TasksModule } from './tasks/tasks.module';
+import { SomemiddlewareMiddleware } from './somemiddleware.middleware';
+import { UsersResolver } from './users/users.resolver';
 
 @Module({
   imports: [
@@ -26,10 +34,28 @@ import { PrismaModule } from './prisma/prisma.module';
       },
       resolvers: { DateTime: GraphQLISODateTime },
     }),
+    // scheduler
+    ScheduleModule.forRoot(),
+
+    PassportModule,
     PrismaModule,
     DonationsModule,
+    AuthModule,
+    UsersModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(SomemiddlewareMiddleware)
+      // .exclude(
+      //   { path: 'users', method: Query },
+      //   { path: 'users', method: Mutation },
+      //   'users/(.*)',
+      // )
+      .forRoutes(UsersResolver);
+  }
+}

@@ -1,0 +1,20 @@
+type Auth {
+  access_token: String!
+}
+
+input SigninAuthInput {
+  email: String!
+  password: String!
+}
+
+input SignupAuthInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  signinAuth(signinAuthInput: SigninAuthInput!): Auth!
+  signupAuth(signupAuthInput: SignupAuthInput!): Auth!
+}

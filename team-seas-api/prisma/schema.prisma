@@ -14,11 +14,18 @@ model Donation {
   id          Int      @id @default(autoincrement())
   count       Int
   displayName String
-  email       String
+  email       String   @unique
   mobile      String?
   team        String?
   message     String?
   createdAt   DateTime @default(now())
 }
 
-
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}

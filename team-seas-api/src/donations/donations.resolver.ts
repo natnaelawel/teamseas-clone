@@ -17,11 +17,8 @@ export class DonationsResolver {
     createDonationInput: CreateDonationInput,
   ) {
     const created = await this.donationsService.create(createDonationInput);
-
     const total = this.donationsService.getTotal();
-
     pubSub.publish('totalUpdated', { totalUpdated: { total } });
-
     return created;
   }
 
